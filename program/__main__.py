@@ -1,21 +1,21 @@
-# This program reads from your gcode file. As long as you've added your `
+# This program reads from your gcode file. As long as you've added your `; <repetition>` lines.
 # TO USE ME:
 # 1. Open your GCode file. Find where your repeating section of GCode starts and ends. This may be easiest to do by searching for `G1 Z...` lines.
-# 2. Separate your GCode's contents such that:
+# 2. Separate your GCode's contents such that there is, in order:
 #   1. A "pre" repetition section containing all the gcode required before the main, repeating, body of gcode.
 #   2. A line reading only `; <repetition>` (without the ` characters)
 #   3. The gcode you wan't repeated
 #   4. `; </repetition>`
-#   5. A "post" repetition section which contains all of your normal the post-pring gcode
-# 3. Edit the 3 initialization values below. They should be all you need. Numerical values are in mm, obviously.
+#   5. A "post" repetition section which contains all of your normal the post-print gcode
+# 3. Edit the 2 initialization values below. They should be all you need. Numerical values are in mm, obviously.
 
 print_height_per_repetition = 1.1  # The z-directional thickness per-repetition. Should be accurate to the (layer-height * layer-count) after slicing, *not* accurate to the STL (though your slicer will try to make these equivalent).
 airgap_between_repetitions = 0.35   # The gap between repetitions. Tweak this to ensure relatively easy separation between clips, without damaging the first-layer quality of each individual clip.
 
 # 4. If you want different filenames or stack counts, change the filenames below.
-# This script defaults to producing "stacking_clips_test.gcode" and "100_clips.gcode".
-# The "_test" gcode file produces 4 repetitions including 4 of the automatically generated, repeating clips.
-# The "100_clips" gcode file makes 100 clips, once you're confident that the test produces good results.
+#   This script defaults to producing "stacking_clips_test.gcode" and "100_clips.gcode".
+#   The "_test" gcode file produces 4 repetitions including 4 of the automatically generated, repeating clips.
+#   The "100_clips" gcode file makes 100 clips, once you're confident that the test produces good results.
 
 gcode_file_i_want_read = "../gcode/working_example.gcode"
 files_i_want_output = [

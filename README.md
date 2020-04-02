@@ -30,24 +30,23 @@ This will, with direction from you, **repeat parts in the Z-axis** up to however
    3. These distinct settings are made possible by (at least): 
       1. Using multiple processes in Simplify3D
       2. Using modifier boxes in PrusaSlicer
-6. Slice your model
-7. Copy your sliced model to `./gcode`.
-8. Open `./program/__main__.py`. **Read and follow the instructions**.
+6. Copy your sliced model to `./gcode`.
+7. Open `./program/__main__.py`. **Read and follow the instructions**.
    * The program **needs** to know which gcode file to read. Target it with `gcode_file_i_want_read`.
    * The program **wants** to know which gcode file(s) you want to output to, and how many repetitions each file contains - change these with `files_i_want_output`.
       * It's important to set the repetitions such that you won't exceed your printer's Z-stop.
-      * The default is `./gcode/stacking_clips_test` with four repetitions, and `./gcode/100_clips` with a mystery number of repetitions.   
+      * The default is `./gcode/stacking_clips_test` with four repetitions, and `./gcode/100_clips` with a mysterious number of repetitions.   
    * There are two numbers you **need** to adjust, since the program needs to know about the total thickness of each repeating part in gcode.
    * There are two lines you **need** to add to your sliced gcode, since the program needs to know which segment of the gcode repeats.
       * The program identifies the start of this repeating section with a `; <repetition>` line in the gcode.
-      * The program identifies the end of this repeating section with a `; </repetition>` line in the gcode'
-      * You need to place these repetition tags manually. Searching the text for for `M1 Z`, or `layer` should do the trick.   
+      * The program identifies the end of this repeating section with a `; </repetition>` line in the gcode.
+      * You need to place these repetition tags manually. Searching the text for for `M1 Z`, or `layer` should help you find the appropriate spots.   
       * Look at `./gcode/working_example.gcode`. for what Taylor Deith actually used for his repetition.
-9. Open a terminal in `./program`, and run `python3 .` or `python .` (or otherwise run Python against the program.)
-10. Wait for completion, and print away!
-    * You'll find the output files in `./gcode`. 
-    * The program defaults to giving you a test file (with four repeats of the stack) and a production file (with 100 stacks). 
-    * You'll want to verify that everything's gone smoothly by printing the test stack - other than the number of repetitions, the two files are identical; quality in the test print translates to quality in the production print.
+8. Open a terminal in `./program`, and run `python3 .` or `python .` (or otherwise run Python against the program.)
+9. Wait for completion, and print away!
+   * You'll find the output files in `./gcode`. 
+   * The program defaults to giving you a test file (with four repeats of the stack) and a production file (with 100 stacks). 
+   * You'll want to verify that everything's gone smoothly by printing the test stack - other than the number of repetitions, the two files are identical; quality in the test print translates to quality in the production print.
     
     
 ### License
