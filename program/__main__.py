@@ -7,20 +7,21 @@
 #   3. The gcode you wan't repeated
 #   4. `; </repetition>`
 #   5. A "post" repetition section which contains all of your normal the post-print gcode
+#   6. If you're lucky, your slicer will let you add these tags to end-of-print and layer-change gcode scripts, and you never need to open your gcode file manually - eg, Simplify3D.
 # 3. Edit the 2 initialization values below. They should be all you need. Numerical values are in mm, obviously.
 
-print_height_per_repetition = 1.1  # The z-directional thickness per-repetition. Should be accurate to the (layer-height * layer-count) after slicing, *not* accurate to the STL (though your slicer will try to make these equivalent).
-airgap_between_repetitions = 0.35   # The gap between repetitions. Tweak this to ensure relatively easy separation between clips, without damaging the first-layer quality of each individual clip.
+print_height_per_repetition = 1.0  # The z-directional thickness per-repetition. Should be accurate to the (layer-height * layer-count) after slicing, *not* accurate to the STL (though your slicer will try to make these equivalent).
+airgap_between_repetitions = 0.35  # The gap between repetitions. Tweak this to ensure relatively easy separation between clips, without damaging the first-layer quality of each individual clip.
 
 # 4. If you want different filenames or stack counts, change the filenames below.
-#   This script defaults to producing "stacking_clips_test.gcode" and "100_clips.gcode".
-#   The "_test" gcode file produces 4 repetitions including 4 of the automatically generated, repeating clips.
-#   The "100_clips" gcode file makes 100 clips, once you're confident that the test produces good results.
+#   This script defaults to producing "test_stack.gcode" and "100_stack.gcode".
+#   The "test" gcode file produces 3 repetitions including 4 of the automatically generated, repeating clips.
+#   The "100_stack" gcode file makes 100 clips, once you're confident that the test produces good results.
 
-gcode_file_i_want_read = "../gcode/working_example.gcode"
+gcode_file_i_want_read = "../gcode/surgical_mask_strap.gcode"
 files_i_want_output = [
-    ("../gcode/stacking_clips_test.gcode", 4),
-    ("../gcode/100_clips.gcode", 100),
+    ("../gcode/test_stack.gcode", 3),
+    ("../gcode/100_stack.gcode", 100),
 ]
 
 # You likely don't need to change anything else, but feel free to monkey with the code below.
@@ -39,8 +40,31 @@ def write_repeated_gcode(file, count):
                 replace = build_replacement(clip_number)
                 for line in read_until(gcode_in, "</repetition>"):
                     gcode_out.write(replace(line))
+                print_progress(file, clip_number, count)
 
             gcode_out.writelines(gcode_in.readlines())
+    print_done(file, count)
+
+
+def print_progress(file_name, progress_count, total_count):
+    prog_separation = int(progress_count / total_count * 66)
+    finished_decoration = "\033[1;32;100m"
+    file_desc = "{} into `{}`".format(total_count, file_name).ljust(66, '.')
+    prog_desc = "{}/{}".format(progress_count, total_count).rjust(7, '.')
+    full_desc = file_desc + prog_desc
+    print("\r{}{}\033[0m{}".format(
+        finished_decoration,
+        full_desc[:prog_separation],
+        full_desc[prog_separation:]
+    ), end='')
+
+
+def print_done(file_name, total_count):
+    file_desc = "{} into `{}`".format(total_count, file_name).ljust(66, '.')
+    prog_desc = "Done!".rjust(7, '.')
+    print("\r{}".format(
+        file_desc + prog_desc
+    ))
 
 
 def read_until(i_file, until):
@@ -52,7 +76,6 @@ def read_until(i_file, until):
 
 
 def build_replacement(clip_number):
-
     # Match all "G1 Z##.###...." lines, upper or lower case. Remembers the "G1 Z" segment, extract the "##.###" segment.
     pattern = r"([Gg]1 .*[zZ])([\d\.]+)"
 
@@ -70,5 +93,16 @@ def build_replacement(clip_number):
 
 
 if __name__ == '__main__':
+    counts = [int(f[1]) for f in files_i_want_output]
+    mm_per_rep = print_height_per_repetition + airgap_between_repetitions
+    print("\n\
+Repeating {} with [{}] repetitions of {:0.3f}mm each.\n\
+\033[1mMax Z height: ~{:0.3f}mm\033[0m.\n".format(
+            gcode_file_i_want_read,
+            ', '.join([str(c) for c in counts]),
+            mm_per_rep,
+            (max(counts) + 1) * mm_per_rep
+        ))
     for filename, stack_size in files_i_want_output:
         write_repeated_gcode(filename, stack_size)
+    print("Everything's wrapped up - happy printing.")
