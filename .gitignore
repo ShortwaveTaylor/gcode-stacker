@@ -2,3 +2,7 @@
 .idea/
 
 *.pyc
+
+gcode/100_stack.gcode
+
+gcode/test_stack.gcode
